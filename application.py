@@ -2,49 +2,41 @@ from flask import Flask, request, render_template
 import pickle
 import numpy as np
 
-# Initialize app
 app = Flask(__name__)
 
-# Load model and scaler
-model = pickle.load(open('models/ridge.pkl', 'rb'))
-scaler = pickle.load(open('models/scaler.pkl', 'rb'))
+model = pickle.load(open("models/ridge.pkl", "rb"))
+scaler = pickle.load(open("models/scaler.pkl", "rb"))
 
-# Home route → shows UI page
-@app.route('/')
+
+@app.route("/")
 def home():
-    return render_template('index.html')   # 👉 change to 'home.html' if needed
+    return render_template("index.html")
 
-# Prediction route
-@app.route('/predictdata', methods=['GET', 'POST'])
+
+@app.route("/predictdata", methods=["GET", "POST"])
 def predict_datapoint():
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
-            # Get values from form
-            Temperature = float(request.form.get('Temperature'))
-            RH = float(request.form.get('RH'))
-            Ws = float(request.form.get('Ws'))
-            Rain = float(request.form.get('Rain'))
-            FFMC = float(request.form.get('FFMC'))
-            DMC = float(request.form.get('DMC'))
-            ISI = float(request.form.get('ISI'))
-            Classes = float(request.form.get('Classes'))
-            Region = float(request.form.get('Region'))
+            temperature = float(request.form.get("Temperature"))
+            rh = float(request.form.get("RH"))
+            ws = float(request.form.get("Ws"))
+            rain = float(request.form.get("Rain"))
+            ffmc = float(request.form.get("FFMC"))
+            dmc = float(request.form.get("DMC"))
+            isi = float(request.form.get("ISI"))
+            classes = float(request.form.get("Classes"))
+            region = float(request.form.get("Region"))
 
-            # Prepare input
-            data = np.array([[Temperature, RH, Ws, Rain, FFMC, DMC, ISI, Classes, Region]])
+            data = np.array([[temperature, rh, ws, rain, ffmc, dmc, isi, classes, region]])
             scaled_data = scaler.transform(data)
-
-            # Prediction
             result = model.predict(scaled_data)[0]
 
-            return render_template('home.html', results=round(result, 2))
-
+            return render_template("home.html", results=round(result, 2))
         except Exception as e:
-            return f"Error: {str(e)}"
+            return render_template("home.html", results=f"Error: {e}")
 
-    else:
-        return render_template('home.html')
+    return render_template("home.html", results=None)
 
-# Run app
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
