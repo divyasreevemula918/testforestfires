@@ -7,9 +7,11 @@ app = Flask(__name__)
 model = pickle.load(open("models/ridge.pkl", "rb"))
 scaler = pickle.load(open("models/scaler.pkl", "rb"))
 
+
 @app.route("/")
 def home():
-    return render_template("index.html")   # ✅ IMPORTANT
+    return render_template("home.html")
+
 
 @app.route("/predictdata", methods=["GET", "POST"])
 def predict_datapoint():
@@ -32,6 +34,7 @@ def predict_datapoint():
         return render_template("home.html", results=round(result, 2))
 
     return render_template("home.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
